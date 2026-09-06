@@ -163,6 +163,19 @@ public class MiListaDoble implements ListInterface{
 
     @Override
     public Object[] toArray() {
+        if (this.isEmpty()){return new Object[0];}
+        DoubleNode nodeIterator = this.head;
+        int size = getSize();
+        Object[] newArray = new Object[size];
+        int contador = 0;
+        while (nodeIterator != null){
+            newArray[contador] = nodeIterator;
+            nodeIterator = nodeIterator.siguiente;
+            contador++;
+            if (contador == size){
+                return newArray;
+            }
+        }
         return new Object[0];
     }
 
