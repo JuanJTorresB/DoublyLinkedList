@@ -1,3 +1,6 @@
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public class MiListaDoble implements ListInterface{
 
     public DoubleNode head = null;
@@ -86,8 +89,12 @@ public class MiListaDoble implements ListInterface{
     @Override
     public boolean add(Object object) {
         DoubleNode tailNode = getTailNode();
-        if (tailNode == null) {return false;}
-        tailNode.siguiente = new DoubleNode(object);
+        if (tailNode == null) {
+            head = new DoubleNode(object);
+            return true;}
+        DoubleNode newNode = new DoubleNode(object);
+        tailNode.siguiente = newNode;
+        newNode.anterior = tailNode;
         return true;
     }
 
@@ -104,29 +111,32 @@ public class MiListaDoble implements ListInterface{
     }
 
     private boolean insertBaseMethod(Object object, DoubleNode insertNode) {
-        if (insertNode == null) {return false;}
+        if (insertNode == null) {
+            return false;
+        }
         DoubleNode newNode = new DoubleNode(object);
-        if (insertNode.anterior != null){
-            insertNode.anterior.siguiente = newNode;
-        }
-        if (insertNode.siguiente != null){
-            insertNode.siguiente.anterior = newNode;
-        }
         newNode.anterior = insertNode.anterior;
         newNode.siguiente = insertNode;
+        if (insertNode.anterior != null) {
+            insertNode.anterior.siguiente = newNode;
+        } else {
+            head = newNode;
+        }
+        insertNode.anterior = newNode;
         return true;
     }
 
     @Override
     public boolean insertHead(Object object) {
-        DoubleNode insertNode = search(getHead());
-        return insertBaseMethod(object, insertNode);
+        if (head == null) {
+            return add(object);
+        }
+        return insertBaseMethod(object, head);
     }
 
     @Override
     public boolean insertTail(Object object) {
-        DoubleNode insertNode = search(getTail());
-        return insertBaseMethod(object, insertNode);
+        return add(object);
     }
 
     @Override
@@ -140,9 +150,17 @@ public class MiListaDoble implements ListInterface{
     @Override
     public boolean remove(DoubleNode node) {
         DoubleNode nodeBuscado = search(node.dato);
-        if (nodeBuscado==null){return false;}
-        nodeBuscado.anterior.siguiente = nodeBuscado.siguiente;
-        nodeBuscado.siguiente.anterior = nodeBuscado.anterior;
+        if (nodeBuscado == null) {
+            return false;
+        }
+        if (nodeBuscado.anterior != null) {
+            nodeBuscado.anterior.siguiente = nodeBuscado.siguiente;
+        } else {
+            head = nodeBuscado.siguiente;
+        }
+        if (nodeBuscado.siguiente != null) {
+            nodeBuscado.siguiente.anterior = nodeBuscado.anterior;
+        }
         return true;
     }
 
@@ -180,7 +198,7 @@ public class MiListaDoble implements ListInterface{
         DoubleNode nodeIterator = this.head;
         int contador = 0;
         while (nodeIterator != null){
-            object[contador] = nodeIterator;
+            object[contador] = nodeIterator.dato;
             nodeIterator = nodeIterator.siguiente;
             contador++;
             if (contador == size){
@@ -192,11 +210,41 @@ public class MiListaDoble implements ListInterface{
 
     @Override
     public MiListaDoble subList(DoubleNode from, DoubleNode to) {
-        return null;
+        MiListaDoble newListaDoble = new MiListaDoble();
+
+        if (this.isEmpty() || from == null || to == null) {
+            return newListaDoble;
+        }
+
+        DoubleNode nodeIterator = search(from.dato);
+        if (nodeIterator == null) {
+            return newListaDoble;
+        }
+        while (nodeIterator != null) {
+            newListaDoble.add(nodeIterator.dato);
+            if (nodeIterator.dato.equals(to.dato)) {
+                break;
+            }
+            nodeIterator = nodeIterator.siguiente;
+        }
+        return newListaDoble;
     }
 
     @Override
     public MiListaDoble sortList() {
-        return null;
+        Object[] array = this.toArray();
+        Arrays.sort(array);
+        MiListaDoble nuevaLista = new MiListaDoble();
+        for (Object object : array) {
+            nuevaLista.add(object);
+        }
+        return nuevaLista;
+    }
+
+    @Override
+    public String toString() {
+        return "MiListaDoble{" +
+                "head=" + head +
+                '}';
     }
 }
